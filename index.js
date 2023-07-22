@@ -31,28 +31,37 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
 
-        // TODO
         // await client.connect();
 
         //Database and Collections Here
-        // const userCollection = client.db("summerCamp").collection("user");
-        // const animeCollection = client.db("AnimeDB").collection("animeData");
-        // const testCollection = client.db("AnimeDB").collection("test");
+        const userCollection = client.db("admissionDB").collection("user");
 
 
-        // CRUD HERE
-
-        // app.get('/all-anime', async (req, res) => {
-        //     const result = await animeCollection.find().toArray()
-        //     res.send(result)
-        // });
-        // app.get('/test-anime', async (req, res) => {
-        //     const result = await testCollection.find().toArray()
-        //     res.send(result)
-        // });
+        app.get('/users', async (req, res) => {
+            const result = await userCollection.find().toArray()
+            res.send(result)
+        });
 
 
 
+ 
+
+
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const result = await userCollection.findOne(query);
+            res.send(result)
+
+        });
+
+
+        app.get('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await userCollection.findOne(query);
+            res.send(result);
+        })
 
 
 
@@ -60,6 +69,43 @@ async function run() {
 
 
 
+
+
+
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email }
+            const existUser = await userCollection.findOne(query)
+            console.log("Already Here:", existUser);
+            if (existUser) {
+                return res.send({ message: 'User Already Exists' })
+            }
+            const result = await userCollection.insertOne(user)
+            res.send(result)
+        });
+
+
+
+
+
+        app.patch('/user/updateUserInfo/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updateTheUsers = req.body;
+            const updatingTheUsers = {
+                $set: {
+                    name: updateTheUsers.name,
+                    email: updateTheUsers.email
+                }
+
+            }
+            const result = await userCollection.updateOne(filter, updatingTheUsers, options)
+            res.send(result);
+
+
+        })
 
 
 
