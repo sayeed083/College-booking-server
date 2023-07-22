@@ -35,6 +35,7 @@ async function run() {
 
         //Database and Collections Here
         const userCollection = client.db("admissionDB").collection("user");
+        const collegeCollection = client.db("admissionDB").collection("allCollege");
 
 
         app.get('/users', async (req, res) => {
@@ -107,7 +108,17 @@ async function run() {
 
         })
 
-
+        app.get('/allCollege', async (req, res) => {
+            const result = await collegeCollection.find().toArray()
+            res.send(result)
+        });
+        app.get('/allCollege/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await collegeCollection.findOne(query);
+            res.send(result);
+            
+        });
 
 
 
