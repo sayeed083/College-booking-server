@@ -36,6 +36,7 @@ async function run() {
         //Database and Collections Here
         const userCollection = client.db("admissionDB").collection("user");
         const collegeCollection = client.db("admissionDB").collection("allCollege");
+        const admissionCollection = client.db("admissionDB").collection("allAdmission");
 
 
         app.get('/users', async (req, res) => {
@@ -45,7 +46,7 @@ async function run() {
 
 
 
- 
+
 
 
         app.get('/users/:email', async (req, res) => {
@@ -78,7 +79,7 @@ async function run() {
             const user = req.body;
             const query = { email: user.email }
             const existUser = await userCollection.findOne(query)
-            console.log("Already Here:", existUser);
+            // console.log("Already Here:", existUser);
             if (existUser) {
                 return res.send({ message: 'User Already Exists' })
             }
@@ -117,7 +118,69 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await collegeCollection.findOne(query);
             res.send(result);
-            
+
+        });
+
+
+
+
+
+
+
+
+
+        // app.post('/allAdmissions', async (req, res) => {
+        //     const admissionClass = (req.body.fullClass);
+        //     const userClass = req.body.currentUser;
+        //     console.log({ admissionClass, userClass });
+        //     const id = userClass.userId;
+        //     const filter = { _id: new ObjectId(id) };
+        //     const options = { upsert: true };
+        //     const userData = {
+        //         $set: {
+        //             _id: userClass.userId,
+        //             name: userClass.name,
+        //             email: userClass.email,
+        //             userImage: userClass.userImage,
+        //             address: userClass.address,
+        //             collegeName: userClass.collegeName
+        //         },
+        //     };
+        //     const result = await admissionCollection.insertOne(admissionClass);
+        //     const updateUserData = await userCollection.updateOne(filter, userData, options);
+        //     res.send({result, updateUserData});
+        // });
+
+
+
+
+
+        app.post('/allAdmissions', async (req, res) => {
+            const admissionClass = req.body.fullClass;
+            const userClass = req.body.currentUser;
+            console.log({ admissionClass, userClass });
+        
+            const userId = userClass.userId;
+            const filter = { _id: new ObjectId(userId) };
+            const userData = {
+                $set: {
+                    name: userClass.name,
+                    email: userClass.email,
+                    userImage: userClass.userImage,
+                    address: userClass.address,
+                    collegeName: userClass.collegeName
+                },
+            };
+        
+            try {
+                const result = await admissionCollection.insertOne(admissionClass); // Assuming admissionCollection is properly initialized.
+                const updateUserData = await userCollection.updateOne(filter, userData);
+        
+                res.send({ result, updateUserData });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("An error occurred.");
+            }
         });
 
 
@@ -129,6 +192,58 @@ async function run() {
 
 
 
+
+
+
+
+        app.get('/allAdmissions', async (req, res) => {
+            const result = await admissionCollection.find().toArray()
+            res.send(result)
+        });
+        app.get('/allAdmissions/:email', async (req, res) => {
+            console.log(req.query.email);
+            let query = {};
+            if (req.query?.email) {
+                query = { email: req.query.email }
+            }
+            const result = await admissionCollection.find(query).toArray();
+            res.send(result)
+        })
+
+
+
+
+
+        app.put('/allCollege/review/:id', async (req, res) => {
+            const id = req.params.id
+            const feedbackClass = req.body;
+            console.log(feedbackClass, 'classData');
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const feedbackClassData = {
+                $set: {
+
+                    review: feedbackClass.review,
+                    rating: feedbackClass.rating,
+                    name: feedbackClass.name,
+                    image: feedbackClass.image,
+                    admissionDate: feedbackClass.admissionDate,
+                    events: feedbackClass.events,
+                    researchHistory: feedbackClass.researchHistory,
+                    admissionProcess: feedbackClass.admissionProcess,
+                    researchWorks: feedbackClass.researchWorks,
+                    sportsCategories: feedbackClass.sportsCategories,
+                    sportsInformation: feedbackClass.sportsInformation
+
+
+                },
+            };
+
+
+            const result = await collegeCollection.updateOne(filter, feedbackClassData, options);
+
+            res.send(result);
+        });
 
 
 
