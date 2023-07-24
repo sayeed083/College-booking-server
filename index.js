@@ -129,28 +129,6 @@ async function run() {
 
 
 
-        // app.post('/allAdmissions', async (req, res) => {
-        //     const admissionClass = (req.body.fullClass);
-        //     const userClass = req.body.currentUser;
-        //     console.log({ admissionClass, userClass });
-        //     const id = userClass.userId;
-        //     const filter = { _id: new ObjectId(id) };
-        //     const options = { upsert: true };
-        //     const userData = {
-        //         $set: {
-        //             _id: userClass.userId,
-        //             name: userClass.name,
-        //             email: userClass.email,
-        //             userImage: userClass.userImage,
-        //             address: userClass.address,
-        //             collegeName: userClass.collegeName
-        //         },
-        //     };
-        //     const result = await admissionCollection.insertOne(admissionClass);
-        //     const updateUserData = await userCollection.updateOne(filter, userData, options);
-        //     res.send({result, updateUserData});
-        // });
-
 
 
 
